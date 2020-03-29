@@ -1,0 +1,3 @@
+name: Parkour
+main: com.hackclub.hackcraft.parkour.ParkourPlugin
+version: 1.0
