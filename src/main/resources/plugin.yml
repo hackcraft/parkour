@@ -1,3 +1,7 @@
 name: Parkour
 main: com.hackclub.hackcraft.parkour.ParkourPlugin
 version: 1.0
+commands:
+  parkour-admin:
+    description: Parkour Administration
+    usage: /<command>
