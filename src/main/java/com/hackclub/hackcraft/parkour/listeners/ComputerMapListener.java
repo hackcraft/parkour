@@ -11,8 +11,8 @@ import org.bukkit.event.block.BlockFromToEvent;
 public class ComputerMapListener implements Listener {
     // all of the custom listeners for the computer map
 
-    final Location WATER_STOP_1 = new Location(Bukkit.getWorld("world"), -194.0, 23, -144);
-    final Location WATER_STOP_2 = new Location(Bukkit.getWorld("world"), -195.0, 23, -144);
+    private final Location WATER_STOP_1 = new Location(Bukkit.getWorld("world"), -194.0, 23, -144);
+    private final Location WATER_STOP_2 = new Location(Bukkit.getWorld("world"), -195.0, 23, -144);
 
 
     @EventHandler
