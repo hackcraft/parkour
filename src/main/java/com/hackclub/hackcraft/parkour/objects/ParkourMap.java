@@ -33,7 +33,27 @@ public class ParkourMap implements ConfigurationSerializable {
         mappedCheckpoints.forEach((c) -> this.checkpoints.add(Location.deserialize(c)));
     }
 
+    @Override
+    public Map<String, Object> serialize() {
+        Map<String, Object> serializer = new HashMap<>();
 
+
+        // serialize basic params
+        serializer.put("id", id);
+        serializer.put("name", name);
+        serializer.put("start", start.serialize());
+        serializer.put("end", end.serialize());
+
+        // serialize arraylist of checkpoints
+        ArrayList<Map<String, Object>> checkpointsSerialized = new ArrayList<>();
+        checkpoints.forEach((c) -> checkpointsSerialized.add(c.serialize()));
+
+
+        // add the serialized list
+        serializer.put("checkpoints", checkpointsSerialized);
+
+        return serializer;
+    }
 
     public Location getStart() {
         return start;
@@ -67,28 +87,5 @@ public class ParkourMap implements ConfigurationSerializable {
     public ArrayList<Location> getCheckpoints() {
         return checkpoints;
     }
-
-    @Override
-    public Map<String, Object> serialize() {
-        Map<String, Object> serializer = new HashMap<>();
-
-
-        // serialize basic params
-        serializer.put("id", id);
-        serializer.put("name", name);
-        serializer.put("start", start.serialize());
-        serializer.put("end", end.serialize());
-
-        // serialize arraylist of checkpoints
-        ArrayList<Map<String, Object>> checkpointsSerialized = new ArrayList<>();
-        checkpoints.forEach((c) -> checkpointsSerialized.add(c.serialize()));
-
-
-        // add the serialized list
-        serializer.put("checkpoints", checkpointsSerialized);
-
-        return serializer;
-    }
-
 
 }

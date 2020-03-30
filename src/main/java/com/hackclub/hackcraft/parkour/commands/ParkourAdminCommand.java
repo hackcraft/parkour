@@ -50,7 +50,10 @@ public class ParkourAdminCommand implements CommandExecutor {
             sender.sendMessage("Map \"" + pm.get().getName() + "\": ");
             sender.sendMessage("Start at " + pm.get().getStart().toString());
             sender.sendMessage("End at " + pm.get().getEnd().toString());
-
+            sender.sendMessage("Checkpoints: ");
+            for (int i = 0; i < pm.get().getCheckpoints().size(); i++) {
+                sender.sendMessage(i + ": " + pm.get().getCheckpoints().get(i).toString());
+            }
             return true;
         }
 
@@ -78,7 +81,7 @@ public class ParkourAdminCommand implements CommandExecutor {
         if (args[0].equalsIgnoreCase("add_checkpoint")) {
             // #getLocation gives the block that the feet are in so you just get what's facing down
             Block standingIn = sender.getLocation().getBlock();
-            if (standingOn.getType() != Material.STONE_PRESSURE_PLATE) {
+            if (standingIn.getType() != Material.STONE_PRESSURE_PLATE) {
                 sender.sendMessage(ChatColor.YELLOW + "You must be standing on a stone pressure plate to set a checkpoint!" + sender.getLocation().getBlock().getType().toString());
                 return true;
             }
@@ -92,7 +95,7 @@ public class ParkourAdminCommand implements CommandExecutor {
 
             ParkourMap pm2 = pm.get();
 
-            if(pm2.addCheckpoint(standingOn.getLocation())) {
+            if(pm2.addCheckpoint(standingIn.getLocation()) && plugin.parkourUtil.saveParkourMap(pm2)) {
               sender.sendMessage(ChatColor.GREEN + "Checkpoint added!");
               return true;
             }
