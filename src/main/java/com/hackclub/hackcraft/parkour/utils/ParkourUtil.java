@@ -1,6 +1,8 @@
 package com.hackclub.hackcraft.parkour.utils;
 
 import com.hackclub.hackcraft.parkour.objects.ParkourMap;
+import org.bukkit.Color;
+import org.bukkit.Particle;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -18,6 +20,7 @@ public class ParkourUtil {
 
     private Plugin plugin;
     private FileConfiguration parkourFile;
+    private ArrayList<ParkourMap> parkourMaps;
 
     File file;
 
@@ -26,6 +29,7 @@ public class ParkourUtil {
         plugin = pl;
         file = new File(plugin.getDataFolder(), "parkour.yml");
         parkourFile = YamlConfiguration.loadConfiguration(file);
+        parkourMaps = new ArrayList<ParkourMap>();
     }
 
     public boolean saveParkourMap(ParkourMap pm) {
@@ -46,12 +50,25 @@ public class ParkourUtil {
         return pm;
     }
 
+    public ArrayList<ParkourMap> loadParkourMaps() {
+        parkourMaps.clear();
+
+        ((MemorySection) parkourFile.get("parkours")).getValues(true).forEach((k, v) -> parkourMaps.add((ParkourMap) v));
+
+        return parkourMaps;
+    }
+
     public ArrayList<ParkourMap> getParkourMaps() {
-        ArrayList<ParkourMap> parkours = new ArrayList<>();
+        return parkourMaps;
+    }
 
-        ((MemorySection) parkourFile.get("parkours")).getValues(true).forEach((k, v) -> parkours.add((ParkourMap) v));
 
-        return parkours;
+    public void spawnCheckpointParticles() {
+        getParkourMaps().forEach((p) -> p.getCheckpoints().forEach((c) -> {
+            // 204, 14, 0 is a dark red
+            Particle.DustOptions du = new Particle.DustOptions(Color.fromRGB(204, 14, 0), 2);
+            c.getWorld().spawnParticle(Particle.REDSTONE, c.clone().add(.5, 1, .5), 50, du);
+        }));
     }
 
 }

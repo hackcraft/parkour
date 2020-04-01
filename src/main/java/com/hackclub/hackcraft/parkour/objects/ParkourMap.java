@@ -76,6 +76,20 @@ public class ParkourMap implements ConfigurationSerializable {
         return checkpoints.add(toAdd);
     }
 
+    public void addCheckpoint(Location toAdd, int before) {
+        checkpoints.add(before, toAdd);
+    }
+
+    public boolean removeCheckpoint(int index) {
+        try {
+            checkpoints.remove(index);
+        } catch (IndexOutOfBoundsException e) {
+            return false;
+        }
+
+        return true;
+    }
+
     public void setStart(Location start) {
         this.start = start;
     }

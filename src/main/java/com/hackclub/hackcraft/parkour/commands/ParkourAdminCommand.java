@@ -2,18 +2,14 @@ package com.hackclub.hackcraft.parkour.commands;
 
 import com.hackclub.hackcraft.parkour.ParkourPlugin;
 import com.hackclub.hackcraft.parkour.objects.ParkourMap;
-import com.hackclub.hackcraft.parkour.objects.ParkourPlayer;
-import com.hackclub.hackcraft.parkour.utils.ParkourUtil;
+import com.hackclub.hackcraft.parkour.utils.Util;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.Optional;
 
@@ -47,12 +43,21 @@ public class ParkourAdminCommand implements CommandExecutor {
                 return true;
             }
 
-            sender.sendMessage("Map \"" + pm.get().getName() + "\": ");
-            sender.sendMessage("Start at " + pm.get().getStart().toString());
-            sender.sendMessage("End at " + pm.get().getEnd().toString());
+            sender.sendMessage(ChatColor.AQUA + "Map \"" + ChatColor.GREEN + pm.get().getName() + ChatColor.AQUA + "\": ");
+            sender.sendMessage("Start at " + ChatColor.BLUE + Util.locationToChat(pm.get().getStart()));
+            sender.sendMessage("End at " + ChatColor.BLUE + Util.locationToChat(pm.get().getEnd()));
             sender.sendMessage("Checkpoints: ");
             for (int i = 0; i < pm.get().getCheckpoints().size(); i++) {
-                sender.sendMessage(i + ": " + pm.get().getCheckpoints().get(i).toString());
+                Location l = pm.get().getCheckpoints().get(i);
+                
+                plugin.getLogger().info(String.valueOf(l.distance(sender.getLocation())));
+                
+                if (l.distance(sender.getLocation()) < 5) {
+                    sender.sendMessage(ChatColor.GREEN + String.valueOf(i) + ": " + ChatColor.BLUE + Util.locationToChat(l) + ChatColor.GREEN + " (You are next to this one!)");
+                    continue;
+                }
+
+                sender.sendMessage(ChatColor.GREEN + String.valueOf(i) + ": " + ChatColor.BLUE + Util.locationToChat(l));
             }
             return true;
         }
@@ -62,8 +67,8 @@ public class ParkourAdminCommand implements CommandExecutor {
             // args[1] is id, args[2] is name
             ParkourMap pm = new ParkourMap(args[1], args[2]);
 
-            pm.setStart(sender.getLocation());
-            pm.setEnd(sender.getLocation());
+            pm.setStart(sender.getLocation().getBlock().getLocation());
+            pm.setEnd(sender.getLocation().getBlock().getLocation());
 
 
             if (plugin.parkourUtil.saveParkourMap(pm)) {
@@ -78,13 +83,9 @@ public class ParkourAdminCommand implements CommandExecutor {
         }
 
         // admin wants to add checkpoint
-        if (args[0].equalsIgnoreCase("add_checkpoint")) {
+        if (args[0].equalsIgnoreCase("adch")) {
             // #getLocation gives the block that the feet are in so you just get what's facing down
             Block standingIn = sender.getLocation().getBlock();
-            if (standingIn.getType() != Material.STONE_PRESSURE_PLATE) {
-                sender.sendMessage(ChatColor.YELLOW + "You must be standing on a stone pressure plate to set a checkpoint!" + sender.getLocation().getBlock().getType().toString());
-                return true;
-            }
 
             Optional<ParkourMap> pm = plugin.parkourUtil.getFromID(args[1]);
 
@@ -94,6 +95,15 @@ public class ParkourAdminCommand implements CommandExecutor {
             }
 
             ParkourMap pm2 = pm.get();
+
+            if (args.length == 3) {
+                // we've specified a before
+                pm2.addCheckpoint(standingIn.getLocation(), Integer.parseInt(args[2]));
+                if (plugin.parkourUtil.saveParkourMap(pm2)) {
+                    sender.sendMessage(ChatColor.GREEN + "Checkpoint added before index " + args[2] + "!");
+                    return true;
+                }
+            }
 
             if(pm2.addCheckpoint(standingIn.getLocation()) && plugin.parkourUtil.saveParkourMap(pm2)) {
               sender.sendMessage(ChatColor.GREEN + "Checkpoint added!");
@@ -105,8 +115,23 @@ public class ParkourAdminCommand implements CommandExecutor {
         }
 
         // admin wants to remove checkpoint
-        if (args[0].equalsIgnoreCase("remove_checkpoint")) {
-            return true;
+        if (args[0].equalsIgnoreCase("rmch")) {
+            Optional<ParkourMap> pm = plugin.parkourUtil.getFromID(args[1]);
+
+            if (!pm.isPresent()) {
+                sender.sendMessage(ChatColor.RED + "That map doesn't exist!");
+                return true;
+            }
+
+            ParkourMap pm2 = pm.get();
+
+            if (pm2.removeCheckpoint(Integer.parseInt(args[2])) && plugin.parkourUtil.saveParkourMap(pm2)) {
+                sender.sendMessage(ChatColor.GREEN + "Checkpoint removed!");
+                return true;
+            } else {
+                sender.sendMessage(ChatColor.RED + "Error while removing checkpoint!");
+                return true;
+            }
         }
 
 

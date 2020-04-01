@@ -2,9 +2,8 @@ package com.hackclub.hackcraft.parkour.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
 
@@ -15,7 +14,7 @@ public class ComputerMapListener implements Listener {
     private final Location WATER_STOP_2 = new Location(Bukkit.getWorld("world"), -195.0, 23, -144);
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onWaterFlow(BlockFromToEvent event) {
         Location loc = event.getToBlock().getLocation();
 
