@@ -6,3 +6,4 @@ commands:
   pkadmin:
     description: Parkour Administration
     usage: /<command>
+    permission: op
